@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Form, Button, Row, Col } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
+import { Container, Form, Button, Row, Col, Card } from 'react-bootstrap';
+import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
-import { setUserId, setResultData } from '../slices/workflowSlice'; 
+import { setUserId, setResultData } from '../slices/workflowSlice';
 
 const InputPage = () => {
   const navigate = useNavigate();
@@ -17,9 +16,15 @@ const InputPage = () => {
   });
   const [jsonInput, setJsonInput] = useState('');
   const [isFormValid, setIsFormValid] = useState(false);
+  const [workflows, setWorkflows] = useState([]);
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState(null);
   const dispatch = useDispatch();
 
   const workflowId = useSelector((state) => state.workflow.data);
+
+  useEffect(() => {
+    fetchWorkflows();
+  }, []);
 
   useEffect(() => {
     validateForm();
@@ -58,33 +63,43 @@ const InputPage = () => {
     setJsonInput(e.target.value);
   };
 
+  const fetchWorkflows = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/workflow');
+      setWorkflows(response.data);
+    } catch (error) {
+      console.error('Error fetching workflows:', error);
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       let response;
+      const currentWorkflowId = selectedWorkflowId || workflowId;
+
+      if (!currentWorkflowId) {
+        alert('Please select a workflow.');
+        return;
+      }
+
       if (inputType === 'json') {
         const parsedData = JSON.parse(jsonInput);
-        console.log('Parsed JSON data:', parsedData);
-        response = await axios.post(`http://localhost:8080/${workflowId}/user`, parsedData);
+        response = await axios.post(`http://localhost:8080/${currentWorkflowId}/user`, parsedData);
       } else {
-        console.log('Form data:', formData);
-        response = await axios.post(`http://localhost:8080/${workflowId}/user`, formData);
+        response = await axios.post(`http://localhost:8080/${currentWorkflowId}/user`, formData);
       }
-  
-      console.log('API Response:', response.data);
+
       dispatch(setUserId(response.data));
-  
-      const response2 = await axios.get(`http://localhost:8080/${workflowId}/user/${response.data}`);
-      console.log('Fetched user data:', response2.data);
+      const response2 = await axios.get(`http://localhost:8080/${currentWorkflowId}/user/${response.data}`);
       dispatch(setResultData(response2.data));
 
       navigate('/flow');
     } catch (error) {
       console.error('Error:', error.response ? error.response.data : error.message);
-  
+
       if (error.response) {
         if (error.response.status === 302) {
           console.log('Redirecting to:', error.response.headers.location);
-          // Handle the redirection logic if needed
         }
         if (error.response.data && error.response.data.message) {
           alert(`Error: ${error.response.data.message}`);
@@ -96,7 +111,24 @@ const InputPage = () => {
       }
     }
   };
-  
+
+  const handleSelect = (workflowId) => {
+    setSelectedWorkflowId(workflowId);
+  };
+
+  const handleEdit = (workflowId) => {
+    console.log('Editing workflow ID:', workflowId);
+    //logic 
+  };
+
+  const handleDelete = async (workflowId) => {
+    try {
+      await axios.delete(`http://localhost:8080/workflow/${workflowId}`);
+      fetchWorkflows();
+    } catch (error) {
+      console.error('Error deleting workflow:', error);
+    }
+  };
 
   return (
     <Container>
@@ -112,7 +144,7 @@ const InputPage = () => {
             </Form.Control>
           </Col>
         </Form.Group>
-        
+
         {inputType === 'form' ? (
           <>
             <Form.Group as={Row} className="mb-3" controlId="formName">
@@ -195,11 +227,29 @@ const InputPage = () => {
             </Col>
           </Form.Group>
         )}
-        
+
         <Button variant="primary" onClick={handleSubmit} disabled={!isFormValid}>
           Submit
         </Button>
       </Form>
+
+      <h2 className="mt-4">Workflows</h2>
+      <Row>
+        {workflows.map((workflow) => (
+          <Col key={workflow.id} sm="4" className="mb-3">
+            <Card>
+              <Card.Body>
+                <Card.Title>{workflow.name}</Card.Title>
+                <div className="d-flex justify-content-end">
+                  <Button variant="primary" className="me-2" onClick={() => handleSelect(workflow.id)}>Select</Button>
+                  <Button variant="secondary" className="me-2" onClick={() => handleEdit(workflow.id)}>Edit</Button>
+                  <Button variant="danger" onClick={() => handleDelete(workflow.id)}>Delete</Button>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </Container>
   );
 };

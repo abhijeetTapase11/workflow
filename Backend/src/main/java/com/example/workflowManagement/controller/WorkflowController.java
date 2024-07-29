@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/")
 public class WorkflowController {
 
@@ -42,6 +43,7 @@ public class WorkflowController {
         workflowService.deleteWorkflowById(workflowId);
     }
 }
+@CrossOrigin(origins = "http://localhost:3000")
 class Object{
     public String id;
     public String name;
