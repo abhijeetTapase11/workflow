@@ -1,4 +1,3 @@
-import React, { useCallback, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -74,6 +73,7 @@ export default function FlowChart() {
       }
     }
     if (data.tasks[i].api_check === "Pincode check") {
+      data.tasks[i].status = data.tasks[i].status === "failure" ? "success" : "failure";
       trueCondition = `Pincode = ${data.tasks[i].condition}xxxx`;
       falseCondition = `Pincode != ${data.tasks[i].condition}xxxx`;
     }
@@ -89,17 +89,17 @@ export default function FlowChart() {
     { id: "3", data: { label: data.tasks[1].api_check }, position: { x: 400, y: 100 }, style: { backgroundColor: data.tasks[0].status === "success" ? color1 : color2 } },
     { id: "4", data: { label: "loan approved" }, position: { x: 300, y: 200 }, style: { backgroundColor: data.tasks[1].status === "failure" && data.tasks[0].status === "success" ? color1 : color2 } },
     { id: "5", data: { label: data.tasks[2].api_check }, position: { x: 500, y: 200 }, style: { backgroundColor: data.tasks[1].status === "success" && data.tasks[0].status === "success" ? color1 : color2 } },
-    { id: "6", data: { label: "loan approval required" }, position: { x: 400, y: 300 }, style: { backgroundColor: data.tasks[2].status === "failure" && data.tasks[1].status === "success" && data.tasks[0].status === "success" ? color1 : color2 } },
-    { id: "7", data: { label: "loan approved" }, position: { x: 600, y: 300 }, style: { backgroundColor: data.tasks[2].status === "success" && data.tasks[1].status === "success" && data.tasks[0].status === "success" ? color1 : color2 } }
+    { id: "6", data: { label:  "loan approved" }, position: { x: 400, y: 300 }, style: { backgroundColor: data.tasks[2].status === "failure" && data.tasks[1].status === "success" && data.tasks[0].status === "success" ? color1 : color2 } },
+    { id: "7", data: { label: "loan approval required" }, position: { x: 600, y: 300 }, style: { backgroundColor: data.tasks[2].status === "success" && data.tasks[1].status === "success" && data.tasks[0].status === "success" ? color1 : color2 } }
   ];
-
+  
   const initialEdges = [
     { id: "e1-2", source: "1", target: "2", label: data.tasks[0].condition[1] },
     { id: "e1-3", source: "1", target: "3", label: data.tasks[0].condition[0] },
     { id: "e3-4", source: "3", target: "4", label: data.tasks[1].condition[1] },
     { id: "e3-5", source: "3", target: "5", label: data.tasks[1].condition[0] },
-    { id: "e5-6", source: "5", target: "6", label: data.tasks[2].condition[0] },
-    { id: "e5-7", source: "5", target: "7", label: data.tasks[2].condition[1] }
+    { id: "e5-6", source: "5", target: "6", label: data.tasks[2].condition[1] },
+    { id: "e5-7", source: "5", target: "7", label: data.tasks[2].condition[0] }
   ];
 
   const nodes = initialNodes;
