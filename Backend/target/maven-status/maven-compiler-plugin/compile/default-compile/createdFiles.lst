@@ -1,0 +1,15 @@
+com/example/workflowManagement/entity/Task.class
+com/example/workflowManagement/controller/WorkflowController.class
+com/example/workflowManagement/entity/Workflow.class
+com/example/workflowManagement/config/WebMvcConfig$1.class
+com/example/workflowManagement/controller/UserController.class
+com/example/workflowManagement/repository/WorkflowRepo.class
+com/example/workflowManagement/repository/UserRepo.class
+com/example/workflowManagement/service/WorkflowService.class
+com/example/workflowManagement/config/WebMvcConfig.class
+com/example/workflowManagement/service/UserService.class
+com/example/workflowManagement/entity/User.class
+com/example/workflowManagement/service/ExecuteWorkflow.class
+com/example/workflowManagement/repository/TaskRepo.class
+com/example/workflowManagement/WorkflowManagementApplication.class
+com/example/workflowManagement/controller/Object.class
